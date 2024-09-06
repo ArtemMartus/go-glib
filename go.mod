@@ -1,4 +1,4 @@
-module github.com/go-gst/go-glib
+module github.com/ArtemMartus/go-glib
 
 go 1.22
 
