@@ -74,7 +74,11 @@ func goInterfaceInit(iface C.gpointer, ifaceData C.gpointer) {
 	ptr := unsafe.Pointer(ifaceData)
 	defer gopointer.Unref(ptr)
 	// Call the downstream interface init handlers
-	data := gopointer.Restore(ptr).(*interfaceData)
+	storedPtr := gopointer.Restore(ptr)
+	data, ok := storedPtr.(*interfaceData)
+	if !ok {
+		panic("some ground up error in go-gst wrapper")
+	}
 	data.iface.Init(&TypeInstance{
 		GoType:        data.classData.elem,
 		GType:         data.gtype,
