@@ -205,16 +205,17 @@ func RegisterGoType(name string, goObject interface{}, extends Extendable, inter
 	if _, ok := goObject.(GoObjectSubclass); ok {
 		for _, iface := range interfaces {
 			if cd == nil {
+				// Pre-panic in here to basically assert that aboves classData pointer related
+				// logic was not broken in a subsequent changes to go-glib
 				panic("class data is nil, will panic in goInterfaceInit after registering")
 			}
-			startingPtr := &interfaceData{
+			gofuncPtr := gopointer.Save(&interfaceData{
 				iface:     iface,
 				gtype:     Type(gtype),
 				classData: cd,
-			}
-			gofuncPtr := gopointer.Save(startingPtr)
+			})
 			ptrData := gopointer.Restore(gofuncPtr)
-			fmt.Println("register go type/interface", startingPtr, ptrData,
+			fmt.Println("register go type/interface", ptrData,
 				ptrData.(*interfaceData), gofuncPtr)
 			ifaceInfo := C.GInterfaceInfo{
 				interface_data:     (C.gpointer)(gofuncPtr),
