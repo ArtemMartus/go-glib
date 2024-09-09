@@ -7,6 +7,7 @@ package glib
 import "C"
 
 import (
+	"fmt"
 	"reflect"
 	"unsafe"
 
@@ -76,6 +77,7 @@ func goInterfaceInit(iface C.gpointer, ifaceData C.gpointer) {
 	// Call the downstream interface init handlers
 	storedPtr := gopointer.Restore(ptr)
 	data, ok := storedPtr.(*interfaceData)
+	fmt.Println("interface init", ifaceData, ptr, storedPtr, data, ok)
 	if !ok {
 		panic("some ground up error in go-gst wrapper")
 	}

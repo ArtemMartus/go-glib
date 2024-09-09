@@ -38,6 +38,7 @@ void  cgoInterfaceInit  (gpointer iface, gpointer iface_data)         { goInterf
 */
 import "C"
 import (
+	"fmt"
 	"reflect"
 	"unsafe"
 
@@ -203,13 +204,17 @@ func RegisterGoType(name string, goObject interface{}, extends Extendable, inter
 	// Add interfaces if the go object implements a GoObjectSubclass
 	if _, ok := goObject.(GoObjectSubclass); ok {
 		for _, iface := range interfaces {
-			gofuncPtr := gopointer.Save(&interfaceData{
+			startingPtr := &interfaceData{
 				iface:     iface,
 				gtype:     Type(gtype),
 				classData: cd,
-			})
+			}
+			gofuncPtr := gopointer.Save(startingPtr)
+			ptrData := gopointer.Restore(gofuncPtr)
+			fmt.Println("register go type/interface", startingPtr, ptrData,
+				ptrData.(*interfaceData), gofuncPtr)
 			ifaceInfo := C.GInterfaceInfo{
-				interface_data:     (C.gpointer)(unsafe.Pointer(gofuncPtr)),
+				interface_data:     (C.gpointer)(gofuncPtr),
 				interface_finalize: nil,
 				interface_init:     C.GInterfaceInitFunc(C.cgoInterfaceInit),
 			}
